@@ -11,8 +11,7 @@ namespace TestServer
     class Program
     {
         static void Main(string[] prefixes)
-        {  while (true)
-            {
+        {  
 
                 if (!HttpListener.IsSupported)
                 {
@@ -32,7 +31,10 @@ namespace TestServer
                     listener.Prefixes.Add(s);
                 }
                 listener.Start();
+            
                 Console.WriteLine("Listening...");
+            while (true)
+            {
                 // Note: The GetContext method blocks while waiting for a request. 
                 HttpListenerContext context = listener.GetContext();
                 HttpListenerRequest request = context.Request;
@@ -41,19 +43,28 @@ namespace TestServer
                 HttpListenerResponse response = context.Response;
                 // Construct a response.
                 string path = @"Content\";
+                response.ContentType = "text/html";
 
-                byte[] buffer = File.ReadAllBytes(path + url);
-               
-                // Get a response stream and write the response to it.
-                response.ContentLength64 = buffer.Length;
-                System.IO.Stream output = response.OutputStream;
-                
+                if (File.Exists((path + url)))
+                {
+                    byte[] buffer = File.ReadAllBytes(path + url);
+
+                    // Get a response stream and write the response to it.
+                    response.ContentLength64 = buffer.Length;
+                    System.IO.Stream output = response.OutputStream;
+
                     output.Write(buffer, 0, buffer.Length);
-                
-                // You must close the output stream.
-                output.Close();
-                listener.Stop();
+
+                    // You must close the output stream.
+                    output.Close();                   
+                }
+                else {
+                    //status 404
+                }
+
             }
+
+            listener.Stop();
         }
     }
 }
