@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.IO;
 namespace TestServer
 {
     class Program
@@ -33,11 +33,13 @@ namespace TestServer
             // Note: The GetContext method blocks while waiting for a request. 
             HttpListenerContext context = listener.GetContext();
             HttpListenerRequest request = context.Request;
+            string request_ = request.RawUrl;
             // Obtain a response object.
             HttpListenerResponse response = context.Response;
             // Construct a response.
             string responseString = "<HTML><BODY> Hello world!</BODY></HTML>";
-            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
+
+            byte[] buffer = File.ReadAllBytes("");
             // Get a response stream and write the response to it.
             response.ContentLength64 = buffer.Length;
             System.IO.Stream output = response.OutputStream;
