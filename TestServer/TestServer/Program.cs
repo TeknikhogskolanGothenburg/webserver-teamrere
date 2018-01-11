@@ -11,28 +11,28 @@ namespace TestServer
     class Program
     {
         static void Main(string[] prefixes)
-        {  
+        {
 
-                if (!HttpListener.IsSupported)
-                {
-                    Console.WriteLine("Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
-                    return;
-                }
-                // URI prefixes are required,
-                // for example "http://contoso.com:8080/index/".
-                if (prefixes == null || prefixes.Length == 0)
-                    throw new ArgumentException("prefixes");
+            if (!HttpListener.IsSupported)
+            {
+                Console.WriteLine("Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
+                return;
+            }
+            // URI prefixes are required,
+            // for example "http://contoso.com:8080/index/".
+            if (prefixes == null || prefixes.Length == 0)
+                throw new ArgumentException("prefixes");
 
-                // Create a listener.
-                HttpListener listener = new HttpListener();
-                // Add the prefixes.
-                foreach (string s in prefixes)
-                {
-                    listener.Prefixes.Add(s);
-                }
-                listener.Start();
-            
-                Console.WriteLine("Listening...");
+            // Create a listener.
+            HttpListener listener = new HttpListener();
+            // Add the prefixes.
+            foreach (string s in prefixes)
+            {
+                listener.Prefixes.Add(s);
+            }
+            listener.Start();
+
+            Console.WriteLine("Listening...");
             while (true)
             {
                 // Note: The GetContext method blocks while waiting for a request. 
@@ -42,10 +42,20 @@ namespace TestServer
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
                 // Construct a response.
-                string path = @"\..\..\Content";
-                string [] responseString = Directory.GetFiles(path);
-                byte[] buffer = new byte[responseString.Length];
-                for (int i = 0; i < responseString.Length; i++)
+                string path = @"Content\";
+                try
+                {
+                    if (url.Substring(url.IndexOf('.'), url.Length - url.IndexOf('.')) == ".jpeg"
+                        || url.Substring(url.IndexOf('.'), url.Length - url.IndexOf('.')) == ".jpg")
+                    {
+                        response.ContentType = "image/jpeg";
+                    }
+                }
+                catch { }
+
+
+
+                if (File.Exists((path + url)))
                 {
                     byte[] buffer = File.ReadAllBytes(path + url);
 
@@ -56,10 +66,11 @@ namespace TestServer
                     output.Write(buffer, 0, buffer.Length);
 
                     // You must close the output stream.
-                    output.Close();                   
+                    output.Close();
                 }
-                else {
-                    //status 404
+                else
+                {
+                    // status 404
                 }
 
             }
