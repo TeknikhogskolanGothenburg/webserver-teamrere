@@ -39,7 +39,7 @@ namespace TestServer
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
                 // Construct a response.
-                string path = "Content";
+                string path = @"\..\..\Content";
                 string [] responseString = Directory.GetFiles(path);
                 byte[] buffer = new byte[responseString.Length];
                 for (int i = 0; i < responseString.Length; i++)
