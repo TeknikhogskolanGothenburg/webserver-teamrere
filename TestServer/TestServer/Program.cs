@@ -36,18 +36,16 @@ namespace TestServer
                 // Note: The GetContext method blocks while waiting for a request. 
                 HttpListenerContext context = listener.GetContext();
                 HttpListenerRequest request = context.Request;
+                string url = request.RawUrl;
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
                 // Construct a response.
-                string path = @"\..\..\Content";
-                string [] responseString = Directory.GetFiles(path);
-                byte[] buffer = new byte[responseString.Length];
-                for (int i = 0; i < responseString.Length; i++)
-                {
-                    buffer = Encoding.UTF8.GetBytes(responseString[i]);
-                }
+                string path = @"Content\";
+
+                byte[] buffer = File.ReadAllBytes(path + url);
+               
                 // Get a response stream and write the response to it.
-                response.ContentLength64 = responseString.Length;
+                response.ContentLength64 = buffer.Length;
                 System.IO.Stream output = response.OutputStream;
                 
                     output.Write(buffer, 0, buffer.Length);
