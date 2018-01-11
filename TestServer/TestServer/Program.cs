@@ -43,7 +43,17 @@ namespace TestServer
                 HttpListenerResponse response = context.Response;
                 // Construct a response.
                 string path = @"Content\";
-                response.ContentType = "text/html";
+                try
+                {
+                    if (url.Substring(url.IndexOf('.'), url.Length - url.IndexOf('.')) == ".jpeg"
+                        || url.Substring(url.IndexOf('.'), url.Length - url.IndexOf('.')) == ".jpg")
+                    {
+                        response.ContentType = "image/jpeg";
+                    }
+                }
+                catch { }
+                
+
 
                 if (File.Exists((path + url)))
                 {
@@ -58,8 +68,9 @@ namespace TestServer
                     // You must close the output stream.
                     output.Close();                   
                 }
-                else {
-                    //status 404
+                else
+                {
+                    // status 404
                 }
 
             }
