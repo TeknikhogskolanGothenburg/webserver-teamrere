@@ -10,29 +10,31 @@ namespace TestServer
 {
     class Program
     {
-        static void Main(string[] prefixes)
-        {  
 
-                if (!HttpListener.IsSupported)
-                {
-                    Console.WriteLine("Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
-                    return;
-                }
-                // URI prefixes are required,
-                // for example "http://contoso.com:8080/index/".
-                if (prefixes == null || prefixes.Length == 0)
-                    throw new ArgumentException("prefixes");
+        static void Main()
+        {
+            string[] prefix = { "http://localhost:8080/" };
 
-                // Create a listener.
-                HttpListener listener = new HttpListener();
-                // Add the prefixes.
-                foreach (string s in prefixes)
-                {
-                    listener.Prefixes.Add(s);
-                }
-                listener.Start();
+            if (!HttpListener.IsSupported)
+            {
+                Console.WriteLine("Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
+                return;
+            }
+            // URI prefixes are required,
+            // for example "http://contoso.com:8080/index/".
+            if (prefix == null || prefix.Length == 0)
+                throw new ArgumentException("prefixes");
+
+            // Create a listener.
+            HttpListener listener = new HttpListener();
+            // Add the prefixes.
+            foreach (string s in prefix)
+            {
+                listener.Prefixes.Add(s);
+            }
+            listener.Start();
             
-                Console.WriteLine("Listening...");
+            Console.WriteLine("Listening...");
             while (true)
             {
                 // Note: The GetContext method blocks while waiting for a request. 
