@@ -1,13 +1,22 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat|Roboto');
+/*
+font-family: 'Roboto', sans-serif;
+font-family: 'Montserrat', sans-serif;
+*/
 body{
-    background-color:#277553;
+    /*background: radial-gradient(#225b42, #277553);*/
+    background: radial-gradient(#277553, #34473f);
+    /*background-color:#225b42 !important;*/
     text-align:center;
-    
+    font-family: 'Montserrat', sans-serif!important;
 }
 h1{
-    color:#f4a341;
+    color:#f4a341 !important;
+    font-family: 'Montserrat', sans-serif!important;
 }
 a{
-    margin:10px;
+    margin: 10px;
+    color: black !important;
 }
 img{
 
@@ -18,8 +27,8 @@ button{
 header{
     background-color: #d9f442;
     opacity:0.5;
-    border-radius:25px;
-    width:50%;
+    border-radius:5px;
+    /*width:50%;*/
     height:2rem;
     display:inline-block;
     margin:1rem;

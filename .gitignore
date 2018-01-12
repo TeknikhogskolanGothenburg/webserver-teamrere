@@ -290,3 +290,6 @@ __pycache__/
 # Approval tests
 *.bak
 *.received.*
+TestServer/TestServer/Program.cs
+
+TestServer/TestServer/Program.cs
