@@ -10,8 +10,12 @@ namespace TestServer
 {
     class Program
     {
+       
         static void Main(string[] prefixes)
         {
+            int cookieName = 0;
+            
+            Dictionary<string, int> cookie = new Dictionary<string, int>();
 
             if (!HttpListener.IsSupported)
             {
@@ -35,12 +39,35 @@ namespace TestServer
             Console.WriteLine("Listening...");
             while (true)
             {
+
                 // Note: The GetContext method blocks while waiting for a request. 
                 HttpListenerContext context = listener.GetContext();
+                if (context.Response.Cookies.Count==0)
+                {                    
+                    cookieName++;                    
+                    context.Response.Cookies.Add(new Cookie("ica",cookieName.ToString()));
+                    cookie.Add("Cookie: " + cookieName, 0);
+                }
+                
                 HttpListenerRequest request = context.Request;
+                cookie["Cookie: " + cookieName]++;
+
                 string url = request.RawUrl;
+
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
+                if (request.RawUrl.StartsWith("/counter")) {
+                    string responseString = "Cookie: " + cookieName +" "+ cookie["Cookie: " + cookieName].ToString();
+                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
+                    // Get a response stream and write the response to it.
+                    response.ContentLength64 = buffer.Length;
+                    System.IO.Stream output = response.OutputStream;
+                    output.Write(buffer, 0, buffer.Length);
+                    // You must close the output stream.
+                    continue;
+                }
+
+                response.Headers.Add(HttpResponseHeader.Expires, DateTime.Now.AddYears(1).ToString());
                 // Construct a response.
                 string path = @"Content\";
                 try
