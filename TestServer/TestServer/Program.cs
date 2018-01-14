@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace TestServer
 {
+    public sealed class HttpCookie { }
+
     class Program
     {
        
@@ -15,7 +17,7 @@ namespace TestServer
         {
             int cookieName = 0;
             
-            Dictionary<string, int> cookie = new Dictionary<string, int>();
+            Dictionary<string, int> cookieDict = new Dictionary<string, int>();
 
             if (!HttpListener.IsSupported)
             {
@@ -37,27 +39,36 @@ namespace TestServer
             listener.Start();
 
             Console.WriteLine("Listening...");
+            HttpListenerContext context = listener.GetContext();
+            HttpListenerContext cookie = listener.GetContext();
+            HttpListenerResponse response = context.Response;
             while (true)
             {
 
                 // Note: The GetContext method blocks while waiting for a request. 
-                HttpListenerContext context = listener.GetContext();
-                if (context.Response.Cookies.Count==0)
-                {                    
-                    cookieName++;                    
-                    context.Response.Cookies.Add(new Cookie("ica",cookieName.ToString()));
-                    cookie.Add("Cookie: " + cookieName, 0);
+                if (response.Cookies.Count == 0)
+                {
+                    cookieName++;
+                    response.Cookies.Add(new Cookie(cookieName.ToString(), "0"));
+                    cookieDict.Add("Cookie: " + cookieName, 0);
+                    context = listener.GetContext();
+
                 }
-                
+
+                else
+                {
+                    context = listener.GetContext();
+                }
+
                 HttpListenerRequest request = context.Request;
-                cookie["Cookie: " + cookieName]++;
+                cookieDict["Cookie: " + cookieName]++;
 
                 string url = request.RawUrl;
 
                 // Obtain a response object.
-                HttpListenerResponse response = context.Response;
+                response = context.Response;
                 if (request.RawUrl.StartsWith("/counter")) {
-                    string responseString = "Cookie: " + cookieName +" "+ cookie["Cookie: " + cookieName].ToString();
+                    string responseString = "Cookie: " + cookieName +" "+ cookieDict["Cookie: " + cookieName].ToString();
                     byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
                     // Get a response stream and write the response to it.
                     response.ContentLength64 = buffer.Length;
@@ -67,7 +78,7 @@ namespace TestServer
                     continue;
                 }
 
-                response.Headers.Add(HttpResponseHeader.Expires, DateTime.Now.AddYears(1).ToString());
+                //response.Headers.Add(HttpResponseHeader.Expires, DateTime.Now.AddYears(1).ToString());
                 // Construct a response.
                 string path = @"Content\";
                 try
