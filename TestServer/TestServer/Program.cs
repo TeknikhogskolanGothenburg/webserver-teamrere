@@ -8,16 +8,14 @@ using System.Threading.Tasks;
 
 namespace TestServer
 {
-    public sealed class HttpCookie { }
-
     class Program
     {
-       
+
         static void Main(string[] prefixes)
         {
-            int cookieName = 0;
-            
-            Dictionary<string, int> cookieDict = new Dictionary<string, int>();
+            int counter = 0;
+
+            Dictionary<string, int> cookie = new Dictionary<string, int>();
 
             if (!HttpListener.IsSupported)
             {
@@ -39,27 +37,28 @@ namespace TestServer
             listener.Start();
 
             Console.WriteLine("Listening...");
-            HttpListenerContext context = listener.GetContext();
-            HttpListenerRequest request = context.Request;
             while (true)
             {
 
                 // Note: The GetContext method blocks while waiting for a request. 
-                if (request.Cookies.Count == 0 || request.Cookies == null)
+                HttpListenerContext context = listener.GetContext();
+                if (context.Response.Cookies.Count == 0)
                 {
-                    cookieDict.Add("Cookie: ", 0);
-
+                    counter++;
+                    context.Response.Cookies.Add(new Cookie("ica", counter.ToString()));
+                    cookie.Add("Cookie: " + counter, 0);
                 }
 
-
-                request = context.Request;
+                HttpListenerRequest request = context.Request;
+                cookie["Cookie: " + counter]++;
 
                 string url = request.RawUrl;
 
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
-                if (request.RawUrl.StartsWith("/counter")) {
-                    string responseString = "Cookie: " + cookieName +" "+ cookieDict["Cookie: " + cookieName].ToString();
+                if (request.RawUrl.StartsWith("/counter"))
+                {
+                    string responseString = "Cookie: " + counter.ToString();
                     byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
                     // Get a response stream and write the response to it.
                     response.ContentLength64 = buffer.Length;
@@ -69,7 +68,7 @@ namespace TestServer
                     continue;
                 }
 
-                //response.Headers.Add(HttpResponseHeader.Expires, DateTime.Now.AddYears(1).ToString());
+                response.Headers.Add(HttpResponseHeader.Expires, DateTime.Now.AddYears(1).ToString());
                 // Construct a response.
                 string path = @"Content\";
                 try
@@ -99,8 +98,6 @@ namespace TestServer
                             Console.WriteLine("File type inncorect");
                             break;
                     }
-                   
-
                 }
                 catch
                 {
@@ -124,7 +121,7 @@ namespace TestServer
                 }
                 else
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 }
 
             }
