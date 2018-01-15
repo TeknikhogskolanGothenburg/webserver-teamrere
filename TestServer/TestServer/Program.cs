@@ -40,33 +40,24 @@ namespace TestServer
 
             Console.WriteLine("Listening...");
             HttpListenerContext context = listener.GetContext();
-            HttpListenerContext cookie = listener.GetContext();
-            HttpListenerResponse response = context.Response;
+            HttpListenerRequest request = context.Request;
             while (true)
             {
 
                 // Note: The GetContext method blocks while waiting for a request. 
-                if (response.Cookies.Count == 0)
+                if (request.Cookies.Count == 0 || request.Cookies == null)
                 {
-                    cookieName++;
-                    response.Cookies.Add(new Cookie(cookieName.ToString(), "0"));
-                    cookieDict.Add("Cookie: " + cookieName, 0);
-                    context = listener.GetContext();
+                    cookieDict.Add("Cookie: ", 0);
 
                 }
 
-                else
-                {
-                    context = listener.GetContext();
-                }
 
-                HttpListenerRequest request = context.Request;
-                cookieDict["Cookie: " + cookieName]++;
+                request = context.Request;
 
                 string url = request.RawUrl;
 
                 // Obtain a response object.
-                response = context.Response;
+                HttpListenerResponse response = context.Response;
                 if (request.RawUrl.StartsWith("/counter")) {
                     string responseString = "Cookie: " + cookieName +" "+ cookieDict["Cookie: " + cookieName].ToString();
                     byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
@@ -83,13 +74,38 @@ namespace TestServer
                 string path = @"Content\";
                 try
                 {
-                    if (url.Substring(url.IndexOf('.'), url.Length - url.IndexOf('.')) == ".jpeg"
-                        || url.Substring(url.IndexOf('.'), url.Length - url.IndexOf('.')) == ".jpg")
+                    switch (pathEnding)
                     {
-                        response.ContentType = "image/jpeg";
+                        case ".html":
+                            Console.WriteLine("html file");
+                            break;
+                        case ".jpg":
+                            Console.WriteLine("jpg file");
+                            break;
+                        case ".gif":
+                            Console.WriteLine(".gif file");
+                            break;
+                        case ".pdf":
+                            Console.WriteLine(".pdf file");
+                            break;
+                        case ".js":
+                            Console.WriteLine(".js file");
+                            break;
+                        case ".css":
+                            Console.WriteLine(".css file");
+                            break;
+
+                        default:
+                            Console.WriteLine("File type inncorect");
+                            break;
                     }
+                    Visat av alla
+
                 }
-                catch { }
+                catch
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                }
 
 
 
@@ -108,7 +124,7 @@ namespace TestServer
                 }
                 else
                 {
-                    // status 404
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                 }
 
             }
@@ -117,3 +133,4 @@ namespace TestServer
         }
     }
 }
+
