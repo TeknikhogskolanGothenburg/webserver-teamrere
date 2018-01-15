@@ -74,7 +74,7 @@ namespace TestServer
                 string path = @"Content\";
                 try
                 {
-                    switch (pathEnding)
+                    switch (path)
                     {
                         case ".html":
                             Console.WriteLine("html file");
