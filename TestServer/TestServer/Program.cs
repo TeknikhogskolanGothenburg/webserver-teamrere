@@ -39,19 +39,18 @@ namespace TestServer
             Console.WriteLine("Listening...");
             while (true)
             {
+                
 
                 // Note: The GetContext method blocks while waiting for a request. 
                 HttpListenerContext context = listener.GetContext();
                 if (context.Response.Cookies.Count == 0)
                 {
-                    counter++;
                     context.Response.Cookies.Add(new Cookie("ica", counter.ToString()));
                     cookie.Add("Cookie: " + counter, 0);
                 }
 
                 HttpListenerRequest request = context.Request;
-                cookie["Cookie: " + counter]++;
-
+                counter++;
                 string url = request.RawUrl;
 
                 // Obtain a response object.
@@ -73,25 +72,39 @@ namespace TestServer
                 string path = @"Content\";
                 try
                 {
-                    switch (path)
+                    string pathEnding = request.RawUrl;
+                    int[] values = new int[1];
+
+                    switch (pathEnding)
                     {
                         case ".html":
-                            Console.WriteLine("html file");
+                            Console.WriteLine("Response was content type text/html");
+                            response.AddHeader("Content-Type", "text/html");
                             break;
                         case ".jpg":
-                            Console.WriteLine("jpg file");
+                            Console.WriteLine("Response was content type image/jpeg");
+                            response.AddHeader("Content-Type", "image/jpeg");
                             break;
                         case ".gif":
-                            Console.WriteLine(".gif file");
+                            Console.WriteLine("Response was content type image/gif");
+                            response.AddHeader("Content-Type", "image/gif");
                             break;
                         case ".pdf":
-                            Console.WriteLine(".pdf file");
+                            Console.WriteLine("Response was content type application/pdf");
+                            response.AddHeader("Content-Type", "application/pdf");
                             break;
                         case ".js":
-                            Console.WriteLine(".js file");
+                            Console.WriteLine("Response was content type application/javascript");
+                            response.AddHeader("Content-Type", "application/javascript");
                             break;
                         case ".css":
-                            Console.WriteLine(".css file");
+                            Console.WriteLine("Response was content type css");
+                            response.AddHeader("Content-Type", "text/css");
+                            break;
+                        case "/dynamic?":
+                            values[0] = Convert.ToInt32(request.QueryString["input1"]);
+                            values[1] = Convert.ToInt32(request.QueryString["input2"]);
+                            int inputTotal = values.Sum();
                             break;
 
                         default:
@@ -99,10 +112,12 @@ namespace TestServer
                             break;
                     }
                 }
+
                 catch
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 }
+                
 
 
 
