@@ -99,7 +99,7 @@ namespace TestServer
                             Console.WriteLine("File type inncorect");
                             break;
                     }
-                    Visat av alla
+                   
 
                 }
                 catch
