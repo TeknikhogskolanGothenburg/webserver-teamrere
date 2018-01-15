@@ -45,20 +45,18 @@ namespace TestServer
                 if (context.Response.Cookies.Count == 0)
                 {
                     counter++;
-                    context.Response.Cookies.Add(new Cookie("ica", counter.ToString()));
                     cookie.Add("Cookie: " + counter, 0);
                 }
 
                 HttpListenerRequest request = context.Request;
-                cookie["Cookie: " + counter]++;
-
+              
                 string url = request.RawUrl;
 
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
                 if (request.RawUrl.StartsWith("/counter"))
                 {
-                    string responseString = "Cookie: " + counter.ToString();
+                    string responseString = "Request: " + counter.ToString();
                     byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
                     // Get a response stream and write the response to it.
                     response.ContentLength64 = buffer.Length;
@@ -76,22 +74,28 @@ namespace TestServer
                     switch (path)
                     {
                         case ".html":
-                            Console.WriteLine("html file");
+                            Console.WriteLine("Response was content type text/html");
+                            response.AddHeader("Content-Type", "text/html");
                             break;
                         case ".jpg":
-                            Console.WriteLine("jpg file");
+                            Console.WriteLine("Response was content type image/jpeg");
+                            response.AddHeader("Content-Type", "image/jpeg");
                             break;
                         case ".gif":
-                            Console.WriteLine(".gif file");
+                            Console.WriteLine("Response was content type image/gif");
+                            response.AddHeader("Content-Type", "image/gif");
                             break;
                         case ".pdf":
-                            Console.WriteLine(".pdf file");
+                            Console.WriteLine("Response was content type application/pdf");
+                            response.AddHeader("Content-Type", "application/pdf");
                             break;
                         case ".js":
-                            Console.WriteLine(".js file");
+                            Console.WriteLine("Response was content type application/javascript");
+                            response.AddHeader("Content-Type", "application/javascript");
                             break;
                         case ".css":
-                            Console.WriteLine(".css file");
+                            Console.WriteLine("Response was content type css");
+                            response.AddHeader("Content-Type", "text/css");
                             break;
 
                         default:
@@ -103,8 +107,6 @@ namespace TestServer
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 }
-
-
 
                 if (File.Exists((path + url)))
                 {
