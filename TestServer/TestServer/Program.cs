@@ -71,6 +71,7 @@ namespace TestServer
                 string path = @"Content\";
                 try
                 {
+
                     switch (path)
                     {
                         case ".html":
@@ -127,7 +128,6 @@ namespace TestServer
                 }
 
             }
-
             listener.Stop();
         }
     }
