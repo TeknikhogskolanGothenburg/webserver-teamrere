@@ -40,23 +40,24 @@ namespace TestServer
             while (true)
             {
 
+
                 // Note: The GetContext method blocks while waiting for a request. 
                 HttpListenerContext context = listener.GetContext();
                 if (context.Response.Cookies.Count == 0)
                 {
-                    counter++;
+                    context.Response.Cookies.Add(new Cookie("ica", counter.ToString()));
                     cookie.Add("Cookie: " + counter, 0);
                 }
 
                 HttpListenerRequest request = context.Request;
-              
+                counter++;
                 string url = request.RawUrl;
 
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
                 if (request.RawUrl.StartsWith("/counter"))
                 {
-                    string responseString = "Request: " + counter.ToString();
+                    string responseString = "Cookie: " + counter.ToString();
                     byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
                     // Get a response stream and write the response to it.
                     response.ContentLength64 = buffer.Length;
@@ -71,8 +72,10 @@ namespace TestServer
                 string path = @"Content\";
                 try
                 {
+                    string pathEnding = request.RawUrl;
+                    int[] values = new int[1];
 
-                    switch (path)
+                    switch (pathEnding)
                     {
                         case ".html":
                             Console.WriteLine("Response was content type text/html");
@@ -98,16 +101,25 @@ namespace TestServer
                             Console.WriteLine("Response was content type css");
                             response.AddHeader("Content-Type", "text/css");
                             break;
+                        case "/dynamic?":
+                            values[0] = Convert.ToInt32(request.QueryString["input1"]);
+                            values[1] = Convert.ToInt32(request.QueryString["input2"]);
+                            int inputTotal = values.Sum();
+                            break;
 
                         default:
                             Console.WriteLine("File type inncorect");
                             break;
                     }
                 }
+
                 catch
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 }
+
+
+
 
                 if (File.Exists((path + url)))
                 {
@@ -128,6 +140,7 @@ namespace TestServer
                 }
 
             }
+
             listener.Stop();
         }
     }
